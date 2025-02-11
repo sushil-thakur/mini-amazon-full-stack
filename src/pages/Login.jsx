@@ -1,22 +1,20 @@
-import React from 'react'
-
 import {
   Box,
   Button,
   FormControl,
   FormHelperText,
-  InputLabel,
-  MenuItem,
-  Select,
   TextField,
   Typography,
 } from "@mui/material";
+import axios from "axios";
 import { Formik } from "formik";
-
+import React from "react";
+import { Link, useNavigate } from "react-router";
 import * as yup from "yup";
-import { Link } from 'react-router';
+import axiosInstance from "../../lib/axios.instance";
 
 const Login = () => {
+  const navigate = useNavigate();
   return (
     <Formik
       initialValues={{
@@ -24,11 +22,28 @@ const Login = () => {
         password: "",
       }}
       validationSchema={yup.object({
-        email: yup.string().required("Email is Required").email("Must be a Valid Email").max(100),
-        password: yup.string().required("Password is Required").max(100).trim(),
+        email: yup
+          .string()
+          .email("Must be a valid email")
+          .required("Email is required.")
+          .trim()
+          .lowercase(),
+        password: yup.string().required("Password is required.").trim(),
       })}
-      onSubmit={(values) => {
-        console.log(values);
+      onSubmit={async (values) => {
+        try {
+          const res = await axiosInstance.post("/user/login", values);
+
+          navigate("/");
+
+          const accessToken = res.data?.accessToken;
+
+          localStorage.setItem("accessToken", accessToken);
+          console.log(res);
+        } catch (error) {
+          console.log("Login user api hit failed...");
+          console.log(error);
+        }
       }}
     >
       {(formik) => {
@@ -40,11 +55,11 @@ const Login = () => {
               flexDirection: "column",
               justifyContent: "center",
               alignItems: "center",
-              gap: "1.5rem",
-              width: 400,
+              gap: "2rem",
+              width: 350,
               boxShadow:
                 "rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px",
-              padding: "1rem",
+              padding: "1rem 1rem 5px 1rem",
             }}
           >
             <Typography variant="h5">Login</Typography>
@@ -72,29 +87,35 @@ const Login = () => {
                 <FormHelperText error>{formik.errors.password}</FormHelperText>
               ) : null}
             </FormControl>
-            
-            <Box 
-            sx = {{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-              width: "100%",
-              gap: "10px",
 
-            }}>
-              
-            
-            <Button fullWidth variant="contained" color="warning" type="submit">
-              submit
-            </Button>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
+                gap: "10px",
+                width: "100%",
+              }}
+            >
+              <Button
+                fullWidth
+                variant="contained"
+                color="warning"
+                type="submit"
+              >
+                submit
+              </Button>
 
-            <Link to = "/register"
-            style={{
-              color: "orangered",
-              textDecoration: "none",
-            }}>
-              New here? Register Now</Link>
+              <Link
+                to="/register"
+                style={{
+                  color: "orangered",
+                  textDecoration: "none",
+                }}
+              >
+                New here? Register
+              </Link>
             </Box>
           </form>
         );

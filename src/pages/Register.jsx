@@ -1,5 +1,3 @@
-import React from 'react'
-
 import {
   Box,
   Button,
@@ -11,36 +9,76 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import axios from "axios";
 import { Formik } from "formik";
-
+import React from "react";
+import { Link, useNavigate } from "react-router";
 import * as yup from "yup";
-import { Link } from 'react-router';
+import axiosInstance from "../../lib/axios.instance";
 
 const Register = () => {
+  const navigate = useNavigate();
+
+  // register student api hit
+  const registerstudent = async (values) => {
+    try {
+      const res = await axiosInstance.post("/student/register", values);
+
+      navigate("/login");
+    } catch (error) {
+      console.log("Register student error...");
+      console.log(error);
+    }
+  };
   return (
     <Formik
       initialValues={{
-        firstName: "",
-        lastName: "",
-        password: "",
+        fullName: "",
         email: "",
-        phoneNumber: "",
         address: "",
-        dateOfBirth: "",
+        password: "",
         gender: "",
+        phoneNumber: "",
       }}
       validationSchema={yup.object({
-          firstName: yup.string().required().max(255),
-          lastName: yup.string().required().max(100),
-          password: yup.string().required().max(100).trim(),
-          email: yup.string().required().email().max(100),
-          phoneNumber: yup.number().notRequired().max(20),
-          address: yup.string().required().max(255),
-          dateOfBirth: yup.date().required(),
-          gender: yup.string().required().oneOf(["Male", "Female", "Other"]),
+        fullName: yup
+          .string()
+          .required("Full name is required.")
+          .trim()
+          .max(255, "Full name must be at max 255 characters."),
+        email: yup
+          .string()
+          .email("Must be valid email.")
+          .required("Email is required.")
+          .trim()
+          .max(100, "Email must be at max 100 characters.")
+          .lowercase(),
+        address: yup
+          .string()
+          .notRequired()
+          .max(255, "Address must be at max 255 characters.")
+          .trim(),
+        password: yup
+          .string()
+          .required("Password is required.")
+          .trim()
+          .min(8, "Password must be at least 8 characters.")
+          .max(30, "Password must be at max 30 characters."),
+        gender: yup
+          .string()
+          .required("Gender is required.")
+          .trim()
+          .oneOf(["male", "female", "other", "preferNotToSay"]),
+
+        phoneNumber: yup
+          .string()
+          .notRequired()
+          .trim()
+          .min(10, "Phone number must be at least 10 characters.")
+          .max(20, "Phone number must be at max 20 characters."),
       })}
-      onSubmit={(values) => {
-        console.log(values);
+      onSubmit={async (values) => {
+        registerstudent(values);
       }}
     >
       {(formik) => {
@@ -63,24 +101,12 @@ const Register = () => {
             <FormControl fullWidth>
               <TextField
                 required
-                label="First Name"
-                {...formik.getFieldProps("firstName")}
+                label="Full Name"
+                {...formik.getFieldProps("fullName")}
               />
 
-              {formik.touched.firstName && formik.errors.firstName ? (
-                <FormHelperText error>{formik.errors.firstName}</FormHelperText>
-              ) : null}
-            </FormControl>
-
-            <FormControl fullWidth>
-              <TextField
-                required
-                label="Last Name"
-                {...formik.getFieldProps("lastName")}
-              />
-
-              {formik.touched.lastName && formik.errors.lastName ? (
-                <FormHelperText error>{formik.errors.lastName}</FormHelperText>
+              {formik.touched.fullName && formik.errors.fullName ? (
+                <FormHelperText error>{formik.errors.fullName}</FormHelperText>
               ) : null}
             </FormControl>
 
@@ -117,17 +143,16 @@ const Register = () => {
 
             <FormControl fullWidth>
               <TextField
-                label="Age"
-                {...formik.getFieldProps("age")}
+                label="Phone Number"
+                {...formik.getFieldProps("phoneNumber")}
               />
 
-              {formik.touched.age && formik.errors.age ? (
+              {formik.touched.phoneNumber && formik.errors.phoneNumber ? (
                 <FormHelperText error>
-                  {formik.errors.age}
+                  {formik.errors.phoneNumber}
                 </FormHelperText>
               ) : null}
             </FormControl>
-
             <FormControl fullWidth>
               <InputLabel required>Gender</InputLabel>
               <Select
@@ -138,6 +163,7 @@ const Register = () => {
                 <MenuItem value={"male"}>Male</MenuItem>
                 <MenuItem value={"female"}>Female</MenuItem>
                 <MenuItem value={"other"}>Other</MenuItem>
+                <MenuItem value={"preferNotToSay"}>Prefer Not To Say</MenuItem>
               </Select>
 
               {formik.touched.gender && formik.errors.gender ? (
@@ -145,28 +171,34 @@ const Register = () => {
               ) : null}
             </FormControl>
 
-            <Box 
-            sx = {{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-              width: "100%",
-              gap: "10px",
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
+                gap: "10px",
+                width: "100%",
+              }}
+            >
+              <Button
+                fullWidth
+                variant="contained"
+                color="warning"
+                type="submit"
+              >
+                submit
+              </Button>
 
-            }}>
-              
-            
-            <Button fullWidth variant="contained" color="warning" type="submit">
-              submit
-            </Button>
-
-            <Link to = "/login"
-            style={{
-              color: "orangered",
-              textDecoration: "none",
-            }}>
-              Already Registered? Login Now</Link>
+              <Link
+                to="/login"
+                style={{
+                  color: "orangered",
+                  textDecoration: "none",
+                }}
+              >
+                Already registered? Login
+              </Link>
             </Box>
           </form>
         );
