@@ -11,7 +11,7 @@ import {
 import { Formik } from "formik";
 import React from "react";
 import * as yup from "yup";
-import axiosInstance from "../../lib/axios.instance";
+import axiosInstance from "../../lib/axios_instance";
 import { useNavigate } from "react-router";
 
 const categoryList = [

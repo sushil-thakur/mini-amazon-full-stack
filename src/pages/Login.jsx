@@ -11,7 +11,7 @@ import { Formik } from "formik";
 import React from "react";
 import { Link, useNavigate } from "react-router";
 import * as yup from "yup";
-import axiosInstance from "../../lib/axios.instance";
+import axiosInstance from "../../lib/axios_instance";
 
 const Login = () => {
   const navigate = useNavigate();

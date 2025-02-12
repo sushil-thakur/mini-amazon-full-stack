@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import ProductCard from "../components/ProductCard";
 import { Box, Button, CircularProgress } from "@mui/material";
-import axiosInstance from "../../lib/axios.instance";
+import axiosInstance from "../../lib/axios_instance";
 // rafce => react arrow function component with export
 import { useNavigate } from "react-router";
 const Home = () => {

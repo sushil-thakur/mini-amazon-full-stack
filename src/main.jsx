@@ -8,6 +8,7 @@ import Register from "./pages/Register";
 import AddProduct from "./pages/AddProduct";
 import EditProduct from "./pages/EditProduct";
 import ProductDetails from "./pages/ProductDetails";
+import Test from "./pages/Test";
 
 
 createRoot(document.getElementById("root")).render(
@@ -20,6 +21,7 @@ createRoot(document.getElementById("root")).render(
           <Route path="/add-product" element={<AddProduct />} />
           <Route path="/edit-product" element={<EditProduct />} />
           <Route path="/product-detail/:id" element={<ProductDetails />} />
+          <Route path="/test" element={<Test/>}/>
 
           
         </Route>
