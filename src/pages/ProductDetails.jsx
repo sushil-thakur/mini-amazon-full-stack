@@ -1,87 +1,143 @@
 import {
   Box,
   Button,
-  Card,
-  CardContent,
-  CardMedia,
   Chip,
+  CircularProgress,
   Stack,
   Typography,
 } from "@mui/material";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import EditIcon from "@mui/icons-material/Edit";
-
+import { useNavigate, useParams } from "react-router";
+import axiosInstance from "../../lib/axios_instance";
 const ProductDetail = () => {
+  const params = useParams();
+  const [productDetails, setProductDetails] = useState({});
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const [deleteLoading, setDeleteLoading] = useState(false);
+
+  const deleteProduct = async () => {
+    try {
+      setDeleteLoading(true);
+      await axiosInstance.delete(`/product/delete/${params.id}`);
+      navigate("/");
+    } catch (error) {
+      console.log("Delete product api hit failed...");
+      console.log(error);
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+  useEffect(() => {
+    const getProductDetails = async () => {
+      try {
+        setLoading(true);
+        const res = await axiosInstance.get(`/product/detail/${params.id}`);
+        setLoading(false);
+        const product = res.data?.productDetails;
+        setProductDetails(product);
+      } catch (error) {
+        setLoading(false);
+        console.log("Get product detail api hit failed...");
+        console.log(error);
+      }
+    };
+
+    getProductDetails();
+  }, []);
+
+  if (loading || deleteLoading) {
+    return <CircularProgress />;
+  }
   return (
-    <Card
+    <Box
       sx={{
         display: "flex",
-        flexDirection: { xs: "column", md: "row" },
-        gap: 4,
-        padding: 3,
-        margin: "3rem auto",
-        maxWidth: "900px",
-        borderRadius: "12px",
-        boxShadow: "0px 8px 20px rgba(0,0,0,0.1)",
+        flexDirection: {
+          xs: "column",
+          md: "row",
+        },
+        justifyContent: "center",
+        alignItems: "flex-start",
+        padding: "1rem",
+        gap: "3rem",
+        margin: "3rem",
+        boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px",
       }}
     >
-      {/* Image Section */}
-      <CardMedia
-        component="img"
-        image="https://cdn.thewirecutter.com/wp-content/media/2023/04/tv-buying-guide-2048px-0032.jpg?auto=webp&quality=75&width=1024"
-        alt="TV"
-        sx={{
-          width: { xs: "100%", md: "40%" },
-          height: "auto",
-          borderRadius: "8px",
-        }}
-      />
+      <Box>
+        <img
+          src={
+            productDetails?.image ||
+            "https://cdn.thewirecutter.com/wp-content/media/2023/04/tv-buying-guide-2048px-0032.jpg?auto=webp&quality=75&width=1024"
+          }
+          alt={productDetails.name}
+          height={"500px"}
+        />
+      </Box>
 
-      {/* Product Details */}
-      <CardContent
+      <Stack
         sx={{
-          display: "flex",
-          flexDirection: "column",
-          gap: 2,
-          flex: 1,
+          gap: "2rem",
+          justifyContent: "space-between",
+          alignItems: "flex-start",
         }}
       >
-        <Typography variant="h5" fontWeight="bold">
-          TV
+        <Typography variant="h5">{productDetails.name}</Typography>
+        <Chip
+          label={productDetails.brand}
+          variant="contained"
+          color="warning"
+        />
+
+        <Typography variant="h6">Price:${productDetails.price}</Typography>
+        <Typography variant="h6">
+          Available Quantity:{productDetails.quantity}
         </Typography>
-        <Chip label="Samsung" variant="outlined" color="warning" />
-        <Typography variant="h6" color="green">
-          Price: $800
-        </Typography>
-        <Typography variant="h6">Available Quantity: 10</Typography>
-        <Typography variant="h6">Category: Electronics</Typography>
+
+        <Box sx={{ display: "flex", gap: "1rem" }}>
+          <Typography variant="h6">Category:</Typography>
+          <Chip
+            label={productDetails.category}
+            variant="contained"
+            color="warning"
+          />
+        </Box>
 
         <Typography
           sx={{
             textAlign: "justify",
-            fontSize: "1rem",
             lineHeight: "1.5rem",
-            color: "gray",
+            fontSize: "1.2rem",
           }}
         >
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Asperiores
-          cumque quos sapiente ab possimus debitis id, perspiciatis molestiae
-          similique explicabo ipsa eius dolorem nihil animi quam dolores
-          inventore consequatur illo eum aliquam placeat aperiam adipisci sed.
+          {productDetails.description}
         </Typography>
 
-        {/* Buttons */}
-        <Stack direction="row" spacing={2} sx={{ marginTop: 2 }}>
+        <Box
+          sx={{
+            display: "flex",
+            gap: "2rem",
+          }}
+        >
           <Button variant="contained" color="success" startIcon={<EditIcon />}>
             Edit
           </Button>
-          <Button variant="contained" color="error" startIcon={<DeleteOutlineIcon />}>
+          <Button
+            variant="contained"
+            color="error"
+            startIcon={<DeleteOutlineIcon />}
+            onClick={() => {
+              deleteProduct();
+            }}
+          >
             Delete
           </Button>
-        </Stack>
-      </CardContent>
-    </Card>
+        </Box>
+      </Stack>
+    </Box>
   );
 };
 

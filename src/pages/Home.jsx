@@ -1,45 +1,37 @@
 import React, { useEffect, useState } from "react";
 import ProductCard from "../components/ProductCard";
-import { Box, Button, CircularProgress } from "@mui/material";
+import { Box, Button, CircularProgress, Pagination } from "@mui/material";
 import axiosInstance from "../../lib/axios_instance";
 // rafce => react arrow function component with export
 import { useNavigate } from "react-router";
 const Home = () => {
   const navigate = useNavigate();
-  const accessToken = localStorage.getItem("accessToken");
   const [products, setProducts] = useState([]);
+  const [totalPage, setTotalPage] = useState(0);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const getProducts = async () => {
+    const getProductList = async () => {
       try {
         setLoading(true);
-        const res = await axiosInstance.post(
-          "/product/list",
-          {
-            page: 1,
-            limit: 10,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-          }
-        );
-
-        const productList = res.data?.productList;
-        const totalPage = res?.data?.totalPage;
-        setProducts(productList);
-        console.log(productList);
-      } catch (error) {
-        console.log("Get products api hit failed...");
-        console.log(error);
-      } finally {
+        const res = await axiosInstance.post("/product/list", {
+          page: 1,
+          limit: 10,
+        });
         setLoading(false);
+        const productList = res?.data?.productList;
+        const numberOfPages = res?.data?.totalPage;
+
+        setProducts(productList);
+        setTotalPage(numberOfPages);
+      } catch (error) {
+        setLoading(false);
+        console.log("Product list api hit failed...");
+        console.log(error);
       }
     };
 
-    getProducts();
+    getProductList();
   }, []);
 
   if (loading) {
@@ -67,19 +59,26 @@ const Home = () => {
         }}
       >
         {products.map((item) => {
+          console.log(item);
           return (
             <ProductCard
               key={item._id}
+              _id={item._id}
               name={item.name}
               brand={item.brand}
               category={item.category}
               price={item.price}
               quantity={item.quantity}
+              description={item.description}
+              image={item.image}
             />
           );
         })}
       </Box>
+      <Pagination count={10} variant="outlined" />
+
     </>
+    
   );
 };
 

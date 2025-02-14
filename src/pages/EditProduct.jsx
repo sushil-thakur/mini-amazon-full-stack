@@ -9,8 +9,10 @@ import {
   Typography,
 } from "@mui/material";
 import { Formik } from "formik";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import * as yup from "yup";
+import { useParams } from "react-router";
+import axiosInstance from "../path/to/axiosInstance"; // Adjust the path as necessary
 
 const categoryList = [
   "grocery",
@@ -22,11 +24,31 @@ const categoryList = [
   "laundry",
 ];
 const EditProduct = () => {
+  const params = useParams();
+  const productId = params.id;
+  const [productDetails, setProductDetails] = useState({});
+  const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    const getProductDetails = async () => {
+      try {
+        setLoading(true);
+        const res=await axiosInstance.get(`/product/detail/${productId}`);
+        setProductDetails(res?.data?.productDetails);
+      } catch (error) {
+        console.log("fetch product details failed...");
+        console.log(error);
+        
+      }
+      finally{
+        setLoading(false);
+      }};
+      getProductDetails();
+  }, []);
   return (
     <Formik
       initialValues={{
-        name: "",
-        brand: "",
+        name: productDetails?.name || "",
+        brand: productDetails?.brand || "",
         price: 0,
         quantity: 1,
         category: "",
@@ -56,7 +78,7 @@ const EditProduct = () => {
               justifyContent: "center",
               alignItems: "center",
               gap: "2rem",
-              width: 410,
+              width: "430px",
               boxShadow:
                 "rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px",
               padding: "1rem",
@@ -147,7 +169,7 @@ const EditProduct = () => {
               ) : null}
             </FormControl>
 
-            <Button fullWidth variant="contained" color="warning" type="submit">
+            <Button fullWidth variant="contained" color="success" type="submit">
               submit
             </Button>
           </form>

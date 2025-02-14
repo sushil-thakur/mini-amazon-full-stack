@@ -9,6 +9,7 @@ import AddProduct from "./pages/AddProduct";
 import EditProduct from "./pages/EditProduct";
 import ProductDetails from "./pages/ProductDetails";
 import Test from "./pages/Test";
+import About from "./pages/About";
 
 
 createRoot(document.getElementById("root")).render(
@@ -22,6 +23,7 @@ createRoot(document.getElementById("root")).render(
           <Route path="/edit-product" element={<EditProduct />} />
           <Route path="/product-detail/:id" element={<ProductDetails />} />
           <Route path="/test" element={<Test/>}/>
+          <Route path="/about" element={<About />} />
 
           
         </Route>
