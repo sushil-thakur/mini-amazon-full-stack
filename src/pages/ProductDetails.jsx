@@ -122,7 +122,14 @@ const ProductDetail = () => {
             gap: "2rem",
           }}
         >
-          <Button variant="contained" color="success" startIcon={<EditIcon />}>
+          <Button
+            variant="contained"
+            color="success"
+            startIcon={<EditIcon />}
+            onClick={() => {
+              navigate(`/edit-product/${params.id}`);
+            }}
+          >
             Edit
           </Button>
           <Button

@@ -15,25 +15,29 @@ import React from "react";
 import { Link, useNavigate } from "react-router";
 import * as yup from "yup";
 import axiosInstance from "../../lib/axios_instance";
-
+import { successNotification } from "../../utils/notification";
 import { Toaster } from "react-hot-toast";
-import { successNotification } from "../../utils/Notification";
 
 const Register = () => {
   const navigate = useNavigate();
 
   // register user api hit
-  const registerUser = async (values) => {
+  const registerstudent = async (values) => {
     try {
-      const res = await axiosInstance.post("/user/register", values);
+      console.log("Registering student with values:", values); // Log the values being sent
+      const res = await axiosInstance.post("/student/register", values);
       successNotification("User is registered successfully");
 
       navigate("/login");
     } catch (error) {
       console.log("Register user error...");
       console.log(error);
+      if (error.response) {
+        console.log("Server responded with:", error.response.data); // Log server response
+      }
     }
   };
+
   return (
     <Box>
       <Toaster />
@@ -74,8 +78,7 @@ const Register = () => {
             .string()
             .required("Gender is required.")
             .trim()
-            .oneOf(["male", "female", "other", "preferNotToSay"]),
-
+            .oneOf(["Male", "Female", "Other", "PreferNotToSay"]),
           phoneNumber: yup
             .string()
             .notRequired()
@@ -84,7 +87,7 @@ const Register = () => {
             .max(20, "Phone number must be at max 20 characters."),
         })}
         onSubmit={async (values) => {
-          registerUser(values);
+          registerstudent(values);
         }}
       >
         {(formik) => {
@@ -173,10 +176,10 @@ const Register = () => {
                   label="Gender"
                   {...formik.getFieldProps("gender")}
                 >
-                  <MenuItem value={"male"}>Male</MenuItem>
-                  <MenuItem value={"female"}>Female</MenuItem>
-                  <MenuItem value={"other"}>Other</MenuItem>
-                  <MenuItem value={"preferNotToSay"}>
+                  <MenuItem value={"Male"}>Male</MenuItem>
+                  <MenuItem value={"Female"}>Female</MenuItem>
+                  <MenuItem value={"Other"}>Other</MenuItem>
+                  <MenuItem value={"PreferNotToSay"}>
                     Prefer Not To Say
                   </MenuItem>
                 </Select>

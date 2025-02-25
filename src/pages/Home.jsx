@@ -9,14 +9,15 @@ const Home = () => {
   const [products, setProducts] = useState([]);
   const [totalPage, setTotalPage] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     const getProductList = async () => {
       try {
         setLoading(true);
         const res = await axiosInstance.post("/product/list", {
-          page: 1,
-          limit: 10,
+          page: currentPage,
+          limit: 6,
         });
         setLoading(false);
         const productList = res?.data?.productList;
@@ -32,13 +33,23 @@ const Home = () => {
     };
 
     getProductList();
-  }, []);
+  }, [currentPage]);
 
   if (loading) {
     return <CircularProgress />;
   }
   return (
-    <>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "1rem",
+        justifyContent: "center",
+        alignItems: "center",
+        padding: "2rem",
+        margin: "3rem 0",
+      }}
+    >
       <Button
         variant="contained"
         color="success"
@@ -75,10 +86,16 @@ const Home = () => {
           );
         })}
       </Box>
-      <Pagination count={10} variant="outlined" />
 
-    </>
-    
+      <Pagination
+        count={totalPage}
+        page={currentPage}
+        color="primary"
+        onChange={(event, value) => {
+          setCurrentPage(value);
+        }}
+      />
+    </Box>
   );
 };
 
